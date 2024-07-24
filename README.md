@@ -4,7 +4,7 @@
 This repository contains all the original **R** codes used for the numerical studies in the paper entitled **On power optimal designs for comparing a set of controls to a set of treatments** authored by **_Arpan Singh, Satya Prakash Singh_**.
 
 # Instructions
- To reproduce the results, use the original **R** codes that are available in the **Master** branch. 
+ To reproduce the results, use the original **R** codes that are available in the **Main** branch. 
 
 1) The following **R** packages are required to use the codes,\
       a) **nloptr**\
