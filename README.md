@@ -9,7 +9,9 @@ This repository contains all the original **R** codes used for the numerical stu
 1) The following **R** packages are required to use the codes,\
       a) **nloptr**\
       b) **mvtnorm**\
-      c) **tictoc**
+      c) **tictoc**\
+      d) **igraph**\
+      e) **gtools**
       
 3) Names of the main files and the **R** codes are self-explainatory. For example the file **Empirical power (Table 4)** contains all the **R** codes used to produce all the **Empirical powers** of all the designs given in the **Table 4**. 
 
