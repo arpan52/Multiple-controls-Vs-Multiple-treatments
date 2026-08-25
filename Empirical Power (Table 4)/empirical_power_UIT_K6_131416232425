@@ -1,0 +1,223 @@
+rm(list = ls())
+set.seed(123)
+
+true.mean <- c(5.50,6.26,5.77,5.52,3.38,3.15)
+K <- length(true.mean)
+psd <- 2.307
+
+n_m <- c(22,22,16,16,16,17) #c(24,24,17,16,14,14)   # max-min design
+#n_b <- c(23,23,19,18,13,13)  # C-optimal design 
+n_b <-  c(18,18,18,18,18,18) #c(17,19,18,17,20,18)  # balanced design
+
+m <- 100000
+
+X.m_mean <- rep(0,K)
+X.b_mean <- rep(0,K)
+
+Y.m_mean <- rep(0,K)
+Y.b_mean <- rep(0,K)
+
+t_stat_m <- rep(0,m)
+t_stat_b <- rep(0,m)
+
+ctr_m <- 0
+ctr_b <- 0
+
+
+############################################################
+# NULL DISTRIBUTION
+############################################################
+
+for (i in 1:m) {
+  
+  for (j in 1:K){
+    
+    X.m <- rnorm(n_m[j], true.mean[1], psd)
+    X.m_mean[j] <- mean(X.m)
+    
+    X.b <- rnorm(n_b[j], true.mean[1], psd)
+    X.b_mean[j] <- mean(X.b)
+    
+  }
+  
+  
+  ##########################################################
+  # Max-min design
+  ##########################################################
+  
+  Z_13_m <- (X.m_mean[1]-X.m_mean[3]) /
+    (psd*sqrt((1/n_m[1])+(1/n_m[3])))
+  
+  Z_14_m <- (X.m_mean[1]-X.m_mean[4]) /
+    (psd*sqrt((1/n_m[1])+(1/n_m[4])))
+  
+  Z_16_m <- (X.m_mean[1]-X.m_mean[6]) /
+    (psd*sqrt((1/n_m[1])+(1/n_m[6])))
+  
+  Z_23_m <- (X.m_mean[2]-X.m_mean[3]) /
+    (psd*sqrt((1/n_m[2])+(1/n_m[3])))
+  
+  Z_24_m <- (X.m_mean[2]-X.m_mean[4]) /
+    (psd*sqrt((1/n_m[2])+(1/n_m[4])))
+  
+  Z_25_m <- (X.m_mean[2]-X.m_mean[5]) /
+    (psd*sqrt((1/n_m[2])+(1/n_m[5])))
+  
+  
+  t_stat_m[i] <- max(c(
+    abs(Z_13_m),
+    abs(Z_14_m),
+    abs(Z_16_m),
+    abs(Z_23_m),
+    abs(Z_24_m),
+    abs(Z_25_m)
+  ))
+  
+  
+  ##########################################################
+  # Balanced design
+  ##########################################################
+  
+  Z_13_b <- (X.b_mean[1]-X.b_mean[3]) /
+    (psd*sqrt((1/n_b[1])+(1/n_b[3])))
+  
+  Z_14_b <- (X.b_mean[1]-X.b_mean[4]) /
+    (psd*sqrt((1/n_b[1])+(1/n_b[4])))
+  
+  Z_16_b <- (X.b_mean[1]-X.b_mean[6]) /
+    (psd*sqrt((1/n_b[1])+(1/n_b[6])))
+  
+  Z_23_b <- (X.b_mean[2]-X.b_mean[3]) /
+    (psd*sqrt((1/n_b[2])+(1/n_b[3])))
+  
+  Z_24_b <- (X.b_mean[2]-X.b_mean[4]) /
+    (psd*sqrt((1/n_b[2])+(1/n_b[4])))
+  
+  Z_25_b <- (X.b_mean[2]-X.b_mean[5]) /
+    (psd*sqrt((1/n_b[2])+(1/n_b[5])))
+  
+  
+  t_stat_b[i] <- max(c(
+    abs(Z_13_b),
+    abs(Z_14_b),
+    abs(Z_16_b),
+    abs(Z_23_b),
+    abs(Z_24_b),
+    abs(Z_25_b)
+  ))
+  
+}
+
+
+############################################################
+# Critical values
+############################################################
+
+q_m <- quantile(t_stat_m, probs = 0.996)
+q_b <- quantile(t_stat_b, probs = 0.996)
+
+
+############################################################
+# ALTERNATIVE DISTRIBUTION
+############################################################
+
+for (i in 1:m) {
+  
+  for (j in 1:K){
+    
+    Y.m <- rnorm(n_m[j], true.mean[j], psd)
+    Y.m_mean[j] <- mean(Y.m)
+    
+    Y.b <- rnorm(n_b[j], true.mean[j], psd)
+    Y.b_mean[j] <- mean(Y.b)
+    
+  }
+  
+  
+  ##########################################################
+  # Max-min design
+  ##########################################################
+  
+  Z_13_m.A <- (Y.m_mean[1]-Y.m_mean[3]) /
+    (psd*sqrt((1/n_m[1])+(1/n_m[3])))
+  
+  Z_14_m.A <- (Y.m_mean[1]-Y.m_mean[4]) /
+    (psd*sqrt((1/n_m[1])+(1/n_m[4])))
+  
+  Z_16_m.A <- (Y.m_mean[1]-Y.m_mean[6]) /
+    (psd*sqrt((1/n_m[1])+(1/n_m[6])))
+  
+  Z_23_m.A <- (Y.m_mean[2]-Y.m_mean[3]) /
+    (psd*sqrt((1/n_m[2])+(1/n_m[3])))
+  
+  Z_24_m.A <- (Y.m_mean[2]-Y.m_mean[4]) /
+    (psd*sqrt((1/n_m[2])+(1/n_m[4])))
+  
+  Z_25_m.A <- (Y.m_mean[2]-Y.m_mean[5]) /
+    (psd*sqrt((1/n_m[2])+(1/n_m[5])))
+  
+  
+  t_stat_m.A <- max(c(
+    abs(Z_13_m.A),
+    abs(Z_14_m.A),
+    abs(Z_16_m.A),
+    abs(Z_23_m.A),
+    abs(Z_24_m.A),
+    abs(Z_25_m.A)
+  ))
+  
+  
+  if(t_stat_m.A > q_m){
+    ctr_m <- ctr_m + 1
+  }
+  
+  
+  ##########################################################
+  # Balanced design
+  ##########################################################
+  
+  Z_13_b.A <- (Y.b_mean[1]-Y.b_mean[3]) /
+    (psd*sqrt((1/n_b[1])+(1/n_b[3])))
+  
+  Z_14_b.A <- (Y.b_mean[1]-Y.b_mean[4]) /
+    (psd*sqrt((1/n_b[1])+(1/n_b[4])))
+  
+  Z_16_b.A <- (Y.b_mean[1]-Y.b_mean[6]) /
+    (psd*sqrt((1/n_b[1])+(1/n_b[6])))
+  
+  Z_23_b.A <- (Y.b_mean[2]-Y.b_mean[3]) /
+    (psd*sqrt((1/n_b[2])+(1/n_b[3])))
+  
+  Z_24_b.A <- (Y.b_mean[2]-Y.b_mean[4]) /
+    (psd*sqrt((1/n_b[2])+(1/n_b[4])))
+  
+  Z_25_b.A <- (Y.b_mean[2]-Y.b_mean[5]) /
+    (psd*sqrt((1/n_b[2])+(1/n_b[5])))
+  
+  
+  t_stat_b.A <- max(c(
+    abs(Z_13_b.A),
+    abs(Z_14_b.A),
+    abs(Z_16_b.A),
+    abs(Z_23_b.A),
+    abs(Z_24_b.A),
+    abs(Z_25_b.A)
+  ))
+  
+  
+  if(t_stat_b.A > q_b){
+    ctr_b <- ctr_b + 1
+  }
+  
+}
+
+
+############################################################
+# Results
+############################################################
+
+print("CV max-min, CV balanced")
+print(c(q_m,q_b))
+
+print("Power max-min, power balanced")
+print(c(ctr_m/m,ctr_b/m))
