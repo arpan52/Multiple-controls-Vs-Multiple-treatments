@@ -1,1 +1,70 @@
 
+clear all;
+
+pairs = [1 4; 1 5; 1 6; 2 4; 2 5; 2 3];  % The pairs of comparisons
+m = max(pairs(:));
+
+ fun = @(y)EQ_general(y, m, pairs)
+ x0 = (1/m)*ones(m,1);
+ lb=zeros(m,1);
+ ub=ones(m,1);
+%x= lsqnonlin(fun,x0,lb,ub)
+
+
+
+Aeq = ones(m,1)';
+beq = 1;
+A=[];
+b=[];
+nonlcon=[];
+options = optimoptions('ga','FunctionTolerance',1e-15);
+x = ga(fun,m,A,b,Aeq,beq,lb,ub,nonlcon,options)
+%x = fmincon(fun,x0,[],[],[1,1,1,1],[1],lb,ub,options)
+eq_value = EQ_general(x, m, pairs)
+
+
+function L = EQ_general(y, m, pairs)
+
+x = y';
+
+n = sqrt(109);
+del = 3.1;
+sigma = 2.3;
+
+% Generate unit vectors e1, e2, ..., em
+E = eye(m);  % Identity matrix, columns are e1, e2, ..., em
+
+num_pairs = size(pairs, 1);  % Number of pairs
+
+mu = zeros(num_pairs, 1);
+p = zeros(num_pairs, 1);
+L_terms = zeros(num_pairs, m);
+
+for k = 1:num_pairs
+    i = pairs(k, 1);  % First index of the pair
+    j = pairs(k, 2);  % Second index of the pair
+    
+    eij = E(:, i) + E(:, j);  % e_{ij} = e_i + e_j
+    Aij = E(:, i) * E(:, j)';  % A_{ij} = e_i * e_j'
+
+    % Compute mu_ij
+    mu(k) = sqrt((x' * Aij * x) / (x' * eij));
+
+    % Compute probability p_ij
+    norm_val = norminv(0.95) - (n * del / sigma) * mu(k);
+    norm_val_1 = -norminv(0.95) - (n * del / sigma) * mu(k);
+    p(k) = normpdf(norm_val) - normpdf(norm_val_1);
+
+
+    % Compute L_ij
+    L_ij_1 = eij' * x * x' * Aij';
+    L_ij_2 = x' * Aij * (eij' * x * eye(m) - x * eij');
+    L_ij_3 = 2 * sqrt(x' * Aij * x) * (x' * eij)^(3/2);
+    L_terms(k,:) = (L_ij_1 + L_ij_2) / L_ij_3;
+end
+
+% Compute final L
+L1 = sum(p .* L_terms);
+L = sum(L1.^2);
+
+end
