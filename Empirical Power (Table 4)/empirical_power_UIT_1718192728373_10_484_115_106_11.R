@@ -1,16 +1,16 @@
 rm(list = ls())
-true.mean <- c(52.7,53.8,53.8,52.3,56.1,52.8,57.8,55.2,56.6,54.8,54.5)     # Sample mean
-K<-length(true.mean)                                                      # No. of comparison groups 
-psd<- 5.62                                                                  # Pooled standard deviation
+set.seed(123)
 
-n_m<- c(12,8,7,7,7,7,14,14,7,11,11)  # max-min design
-n_b= c(10,10,10,10,10,10,9,9,9,9,9)   # balance design
+true.mean <- true.mean <- c(
+  5.50,6.26,3.38,3.15,5.52,5.77,5.77,5.52,5.77,5.52) 
+K<-length(true.mean)
+psd<- 2.29
 
-m<-100000                                                 #No. of Iterations
+n_m <- c(34,31,14,14,14,15,15,15,15,15)# c(24,12,10,9,9,9,9,9,9,9)   # max-min design
+#n_b <- c(33,27,12,12,12,17,17,17,17,17) #c(20,16,7,7,8,11,10,10,10,10)  #rep(17,10)  #   # balance design
+n_b <- rep(18,10)
 
-# Initializations
-
-
+m<-100000
 X.m_mean<-rep(0,K)
 X.b_mean<-rep(0,K)
 
@@ -26,7 +26,7 @@ ctr_m<-0
 ctr_b<-0
 
 
-for (i in 1:m) {
+for (i in 1:m) {  #simulating from max-min design
   for (j in 1:K){
     X.m <- rnorm(n_m[j],true.mean[1],psd)  # null data from max--min design
     X.m_mean[j] <- mean(X.m)
@@ -35,41 +35,59 @@ for (i in 1:m) {
     X.b_mean[j] <- mean(X.b)
   }
   
+  ## Max-min design
+  
+  Z_13_m = (X.m_mean[1]-X.m_mean[3])/(psd*sqrt((1/n_m[1])+(1/n_m[3])))
+  Z_14_m = (X.m_mean[1]-X.m_mean[4])/(psd*sqrt((1/n_m[1])+(1/n_m[4])))
+  Z_15_m = (X.m_mean[1]-X.m_mean[5])/(psd*sqrt((1/n_m[1])+(1/n_m[5])))
+  Z_16_m = (X.m_mean[1]-X.m_mean[6])/(psd*sqrt((1/n_m[1])+(1/n_m[6])))
   Z_17_m = (X.m_mean[1]-X.m_mean[7])/(psd*sqrt((1/n_m[1])+(1/n_m[7])))
   Z_18_m = (X.m_mean[1]-X.m_mean[8])/(psd*sqrt((1/n_m[1])+(1/n_m[8])))
   Z_19_m = (X.m_mean[1]-X.m_mean[9])/(psd*sqrt((1/n_m[1])+(1/n_m[9])))
+  Z_110_m = (X.m_mean[1]-X.m_mean[10])/(psd*sqrt((1/n_m[1])+(1/n_m[10])))
+  
+  Z_26_m = (X.m_mean[2]-X.m_mean[6])/(psd*sqrt((1/n_m[2])+(1/n_m[6])))
   Z_27_m = (X.m_mean[2]-X.m_mean[7])/(psd*sqrt((1/n_m[2])+(1/n_m[7])))
   Z_28_m = (X.m_mean[2]-X.m_mean[8])/(psd*sqrt((1/n_m[2])+(1/n_m[8])))
-  Z_37_m = (X.m_mean[3]-X.m_mean[7])/(psd*sqrt((1/n_m[3])+(1/n_m[7])))
-  Z_310_m = (X.m_mean[3]-X.m_mean[10])/(psd*sqrt((1/n_m[3])+(1/n_m[10])))
-  Z_48_m = (X.m_mean[4]-X.m_mean[8])/(psd*sqrt((1/n_m[4])+(1/n_m[8])))
-  Z_411_m = (X.m_mean[4]-X.m_mean[11])/(psd*sqrt((1/n_m[4])+(1/n_m[11])))
-  Z_510_m = (X.m_mean[5]-X.m_mean[10])/(psd*sqrt((1/n_m[5])+(1/n_m[10])))
-  Z_611_m = (X.m_mean[6]-X.m_mean[11])/(psd*sqrt((1/n_m[6])+(1/n_m[11])))
+  Z_29_m = (X.m_mean[2]-X.m_mean[9])/(psd*sqrt((1/n_m[2])+(1/n_m[9])))
+  Z_210_m = (X.m_mean[2]-X.m_mean[10])/(psd*sqrt((1/n_m[2])+(1/n_m[10])))
   
-  t_stat_m[i]<- max(c(abs(Z_17_m),abs(Z_18_m),abs(Z_19_m),abs(Z_27_m),abs(Z_28_m),abs(Z_37_m),abs(Z_310_m),abs(Z_48_m),abs(Z_411_m),abs(Z_510_m),abs(Z_611_m)))                          #test statistics under the null for max-min design
+  t_stat_m[i] <- max(abs(c(
+    Z_13_m, Z_14_m, Z_15_m, Z_16_m,
+    Z_17_m, Z_18_m, Z_19_m, Z_110_m,
+    Z_26_m, Z_27_m, Z_28_m, Z_29_m, Z_210_m
+  )))
   
+  
+  ## Balanced design
+  
+  Z_13_b = (X.b_mean[1]-X.b_mean[3])/(psd*sqrt((1/n_b[1])+(1/n_b[3])))
+  Z_14_b = (X.b_mean[1]-X.b_mean[4])/(psd*sqrt((1/n_b[1])+(1/n_b[4])))
+  Z_15_b = (X.b_mean[1]-X.b_mean[5])/(psd*sqrt((1/n_b[1])+(1/n_b[5])))
+  Z_16_b = (X.b_mean[1]-X.b_mean[6])/(psd*sqrt((1/n_b[1])+(1/n_b[6])))
   Z_17_b = (X.b_mean[1]-X.b_mean[7])/(psd*sqrt((1/n_b[1])+(1/n_b[7])))
   Z_18_b = (X.b_mean[1]-X.b_mean[8])/(psd*sqrt((1/n_b[1])+(1/n_b[8])))
   Z_19_b = (X.b_mean[1]-X.b_mean[9])/(psd*sqrt((1/n_b[1])+(1/n_b[9])))
+  Z_110_b = (X.b_mean[1]-X.b_mean[10])/(psd*sqrt((1/n_b[1])+(1/n_b[10])))
+  
+  Z_26_b = (X.b_mean[2]-X.b_mean[6])/(psd*sqrt((1/n_b[2])+(1/n_b[6])))
   Z_27_b = (X.b_mean[2]-X.b_mean[7])/(psd*sqrt((1/n_b[2])+(1/n_b[7])))
   Z_28_b = (X.b_mean[2]-X.b_mean[8])/(psd*sqrt((1/n_b[2])+(1/n_b[8])))
-  Z_37_b = (X.b_mean[3]-X.b_mean[7])/(psd*sqrt((1/n_b[3])+(1/n_b[7])))
-  Z_310_b = (X.b_mean[3]-X.b_mean[10])/(psd*sqrt((1/n_b[3])+(1/n_b[10])))
-  Z_48_b = (X.b_mean[4]-X.b_mean[8])/(psd*sqrt((1/n_b[4])+(1/n_b[8])))
-  Z_411_b = (X.b_mean[4]-X.b_mean[11])/(psd*sqrt((1/n_b[4])+(1/n_b[11])))
-  Z_510_b = (X.b_mean[5]-X.b_mean[10])/(psd*sqrt((1/n_b[5])+(1/n_b[10])))
-  Z_611_b = (X.b_mean[6]-X.b_mean[11])/(psd*sqrt((1/n_b[6])+(1/n_b[11])))
+  Z_29_b = (X.b_mean[2]-X.b_mean[9])/(psd*sqrt((1/n_b[2])+(1/n_b[9])))
+  Z_210_b = (X.b_mean[2]-X.b_mean[10])/(psd*sqrt((1/n_b[2])+(1/n_b[10])))
   
-  t_stat_b[i]<- max(c(abs(Z_17_b),abs(Z_18_b),abs(Z_19_b),abs(Z_27_b),abs(Z_28_b),abs(Z_37_b),abs(Z_310_b),abs(Z_48_b),abs(Z_411_b),abs(Z_510_b),abs(Z_611_b)))                          #test statistics under the null for balanced design
-  
+  t_stat_b[i] <- max(abs(c(
+    Z_13_b, Z_14_b, Z_15_b, Z_16_b,
+    Z_17_b, Z_18_b, Z_19_b, Z_110_b,
+    Z_26_b, Z_27_b, Z_28_b, Z_29_b, Z_210_b
+  )))
 }
 
-q_m<- quantile(t_stat_b,probs = 0.95)                                       # Critical value for Max--min design
-q_b<- quantile(t_stat_b,probs = 0.95)                                        # Critical value for Max--min design
+q_m<- quantile(t_stat_m,probs = 0.998)
+q_b<- quantile(t_stat_b,probs = 0.998)
 
 
-for (i in 1:m) { 
+for (i in 1:m) {
   for (j in 1:K){
     Y.m <- rnorm(n_m[j],true.mean[j],psd)  # alternative data from max--min design
     Y.m_mean[j] <- mean(Y.m)
@@ -78,38 +96,55 @@ for (i in 1:m) {
     Y.b_mean[j] <- mean(Y.b)
   }
   
+  ## Max-min design
+  
+  Z_13_m.A = (Y.m_mean[1]-Y.m_mean[3])/(psd*sqrt((1/n_m[1])+(1/n_m[3])))
+  Z_14_m.A = (Y.m_mean[1]-Y.m_mean[4])/(psd*sqrt((1/n_m[1])+(1/n_m[4])))
+  Z_15_m.A = (Y.m_mean[1]-Y.m_mean[5])/(psd*sqrt((1/n_m[1])+(1/n_m[5])))
+  Z_16_m.A = (Y.m_mean[1]-Y.m_mean[6])/(psd*sqrt((1/n_m[1])+(1/n_m[6])))
   Z_17_m.A = (Y.m_mean[1]-Y.m_mean[7])/(psd*sqrt((1/n_m[1])+(1/n_m[7])))
   Z_18_m.A = (Y.m_mean[1]-Y.m_mean[8])/(psd*sqrt((1/n_m[1])+(1/n_m[8])))
   Z_19_m.A = (Y.m_mean[1]-Y.m_mean[9])/(psd*sqrt((1/n_m[1])+(1/n_m[9])))
+  Z_110_m.A = (Y.m_mean[1]-Y.m_mean[10])/(psd*sqrt((1/n_m[1])+(1/n_m[10])))
+  
+  Z_26_m.A = (Y.m_mean[2]-Y.m_mean[6])/(psd*sqrt((1/n_m[2])+(1/n_m[6])))
   Z_27_m.A = (Y.m_mean[2]-Y.m_mean[7])/(psd*sqrt((1/n_m[2])+(1/n_m[7])))
   Z_28_m.A = (Y.m_mean[2]-Y.m_mean[8])/(psd*sqrt((1/n_m[2])+(1/n_m[8])))
-  Z_37_m.A = (Y.m_mean[3]-Y.m_mean[7])/(psd*sqrt((1/n_m[3])+(1/n_m[7])))
-  Z_310_m.A = (Y.m_mean[3]-Y.m_mean[10])/(psd*sqrt((1/n_m[3])+(1/n_m[10])))
-  Z_48_m.A = (Y.m_mean[4]-Y.m_mean[8])/(psd*sqrt((1/n_m[4])+(1/n_m[8])))
-  Z_411_m.A = (Y.m_mean[4]-Y.m_mean[11])/(psd*sqrt((1/n_m[4])+(1/n_m[11])))
-  Z_510_m.A = (Y.m_mean[5]-Y.m_mean[10])/(psd*sqrt((1/n_m[5])+(1/n_m[10])))
-  Z_611_m.A = (Y.m_mean[6]-Y.m_mean[11])/(psd*sqrt((1/n_m[6])+(1/n_m[11])))
+  Z_29_m.A = (Y.m_mean[2]-Y.m_mean[9])/(psd*sqrt((1/n_m[2])+(1/n_m[9])))
+  Z_210_m.A = (Y.m_mean[2]-Y.m_mean[10])/(psd*sqrt((1/n_m[2])+(1/n_m[10])))
   
-  t_stat_m.A<-  max(c(abs(Z_17_m.A),abs(Z_18_m.A),abs(Z_19_m.A),abs(Z_27_m.A),abs(Z_28_m.A),abs(Z_37_m.A),abs(Z_310_m.A),abs(Z_48_m.A),abs(Z_411_m.A),abs(Z_510_m.A),abs(Z_611_m.A)))      #test statistics under the altenative for max-min design
+  t_stat_m.A <- max(abs(c(
+    Z_13_m.A, Z_14_m.A, Z_15_m.A, Z_16_m.A,
+    Z_17_m.A, Z_18_m.A, Z_19_m.A, Z_110_m.A,
+    Z_26_m.A, Z_27_m.A, Z_28_m.A, Z_29_m.A, Z_210_m.A
+  )))
   
   if(t_stat_m.A>q_m){
     ctr_m <- ctr_m+1
   }
   
+  ## Balanced design
+  
+  Z_13_b.A = (Y.b_mean[1]-Y.b_mean[3])/(psd*sqrt((1/n_b[1])+(1/n_b[3])))
+  Z_14_b.A = (Y.b_mean[1]-Y.b_mean[4])/(psd*sqrt((1/n_b[1])+(1/n_b[4])))
+  Z_15_b.A = (Y.b_mean[1]-Y.b_mean[5])/(psd*sqrt((1/n_b[1])+(1/n_b[5])))
+  Z_16_b.A = (Y.b_mean[1]-Y.b_mean[6])/(psd*sqrt((1/n_b[1])+(1/n_b[6])))
   Z_17_b.A = (Y.b_mean[1]-Y.b_mean[7])/(psd*sqrt((1/n_b[1])+(1/n_b[7])))
   Z_18_b.A = (Y.b_mean[1]-Y.b_mean[8])/(psd*sqrt((1/n_b[1])+(1/n_b[8])))
   Z_19_b.A = (Y.b_mean[1]-Y.b_mean[9])/(psd*sqrt((1/n_b[1])+(1/n_b[9])))
+  Z_110_b.A = (Y.b_mean[1]-Y.b_mean[10])/(psd*sqrt((1/n_b[1])+(1/n_b[10])))
+  
+  Z_26_b.A = (Y.b_mean[2]-Y.b_mean[6])/(psd*sqrt((1/n_b[2])+(1/n_b[6])))
   Z_27_b.A = (Y.b_mean[2]-Y.b_mean[7])/(psd*sqrt((1/n_b[2])+(1/n_b[7])))
   Z_28_b.A = (Y.b_mean[2]-Y.b_mean[8])/(psd*sqrt((1/n_b[2])+(1/n_b[8])))
-  Z_37_b.A = (Y.b_mean[3]-Y.b_mean[7])/(psd*sqrt((1/n_b[3])+(1/n_b[7])))
-  Z_310_b.A = (Y.b_mean[3]-Y.b_mean[10])/(psd*sqrt((1/n_b[3])+(1/n_b[10])))
-  Z_48_b.A = (Y.b_mean[4]-Y.b_mean[8])/(psd*sqrt((1/n_b[4])+(1/n_b[8])))
-  Z_411_b.A = (Y.b_mean[4]-Y.b_mean[11])/(psd*sqrt((1/n_b[4])+(1/n_b[11])))
-  Z_510_b.A = (Y.b_mean[5]-Y.b_mean[10])/(psd*sqrt((1/n_b[5])+(1/n_b[10])))
-  Z_611_b.A = (Y.b_mean[6]-Y.b_mean[11])/(psd*sqrt((1/n_b[6])+(1/n_b[11])))
+  Z_29_b.A = (Y.b_mean[2]-Y.b_mean[9])/(psd*sqrt((1/n_b[2])+(1/n_b[9])))
+  Z_210_b.A = (Y.b_mean[2]-Y.b_mean[10])/(psd*sqrt((1/n_b[2])+(1/n_b[10])))
   
-  t_stat_b.A<-  max(c(abs(Z_17_b.A),abs(Z_18_b.A),abs(Z_19_b.A),abs(Z_27_b.A),abs(Z_28_b.A),abs(Z_37_b.A),abs(Z_310_b.A),abs(Z_48_b.A),abs(Z_411_b.A),abs(Z_510_b.A),abs(Z_611_b.A)))      #test statistics under the altenative for max-min design
-  
+  t_stat_b.A <- max(abs(c(
+    Z_13_b.A, Z_14_b.A, Z_15_b.A, Z_16_b.A,
+    Z_17_b.A, Z_18_b.A, Z_19_b.A, Z_110_b.A,
+    Z_26_b.A, Z_27_b.A, Z_28_b.A, Z_29_b.A, Z_210_b.A
+  )))
   if (t_stat_b.A>q_b){
     ctr_b <- ctr_b+1
   }
@@ -122,5 +157,3 @@ print(c(q_m,q_b))
 
 print('power max-min, power balanced')
 print(c(ctr_m/m,ctr_b/m))
-
-
